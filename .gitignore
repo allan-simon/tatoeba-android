@@ -1,0 +1,8 @@
+.project
+*.swp
+.settings
+local.properties
+bin/
+out/
+tmp/
+gen/

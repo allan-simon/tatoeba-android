@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="tatoeba" default="help">
+
+<!-- The local.properties file is created and updated by the 'android'
+     tool.
+     It contains the path to the SDK. It should *NOT* be checked into
+     Version Control Systems. -->
+    <property file="local.properties" />
+
+    <!-- The build.properties file can be created by you and is never touched
+         by the 'android' tool. This is the place to change some of the
+         default property values used by the Ant rules.
+         Here are some properties you may want to change/update:
+
+         source.dir
+             The name of the source directory. Default is 'src'.
+         out.dir
+             The name of the output directory. Default is 'bin'.
+
+         Properties related to the SDK location or the project target should
+         be updated using the 'android' tool with the 'update' action.
+
+         This file is an integral part of the build system for your
+         application and should be checked into Version Control Systems.
+
+         -->
+    <property file="build.properties" />
+
+    <!-- The default.properties file is created and updated by the 'android'
+         tool, as well as ADT.
+         This file is an integral part of the build system for your
+         application and should be checked into Version Control Systems. -->
+    <property file="default.properties" />
+
+    <path id="junit_classpath">
+
+        <!-- NOTE: junit.jar must come before android.jar -->
+        <pathelement location="${libs.dir}/junit-4.8.2.jar"/>
+
+        <pathelement path="${build.dir}"/>
+        <fileset dir="${libs.dir}" includes="*.jar"/>
+        <fileset dir="${external.libs.dir}" includes="*.jar"/>
+        <fileset dir="libs" includes="*.jar"/>
+        <fileset dir="${test.external.libs.dir}" includes="*.jar"/>
+    </path>
+
+    <!-- Required pre-setup import -->
+    <import file="${sdk.dir}/tools/ant/pre_setup.xml" />
+
+
+    <target name="compile.tests" depends="compile"
+            description="compile module source; test classes" unless="skip.tests">
+        <mkdir dir="${out.test-classes.absolute.dir}"/>
+
+        <javac encoding="ascii" source="1.6" target="1.6" debug="true" extdirs=""
+               destdir="out"
+               verbose="${verbose}" classpath="${robolectric.sample.external.libs.dir}">
+            <src path="${test.dir}"/>
+            <classpath>
+                <pathelement path="${out.classes.absolute.dir}"/>
+                <path refid="android.target.classpath"/>
+                <fileset dir="${test.external.libs.dir}" includes="*.jar"/>
+                <fileset dir="${robolectric.sample.external.libs.dir}" includes="*.jar"/>
+            </classpath>
+        </javac>
+    </target>
+
+
+    <target name="clean" depends="android_rules.clean" description="clean up" >
+        <delete dir="${out.test-classes.absolute.dir}"/>
+        <delete dir="${tmp.dir}"/>
+        <delete dir="${build.dir}"/>
+        <delete dir="${test.output.dir}"/>
+        <delete file="${basedir}/tmp/cached-robolectric-classes.jar"/>
+    </target>
+
+
+    <target name="test" depends="compile.tests" description="test all">
+        <mkdir dir="${basedir}/out/reports/tests"/>
+        <junit showoutput="true" failureproperty="junit.failure">
+            <formatter type="plain"/>
+            <formatter type="xml"/>
+            <batchtest todir="${basedir}/out/reports/tests">
+                <fileset dir="${test.dir}">
+                    <include name="**/*Test.java"/>
+                </fileset>
+            </batchtest>
+            <classpath>
+                <pathelement path="${out.classes.absolute.dir}"/>
+                <pathelement path="${out.test-classes.absolute.dir}"/>
+                <fileset dir="${test.external.libs.dir}" includes="*.jar"/>
+                <fileset dir="${robolectric.sample.external.libs.dir}" includes="*.jar"/>
+
+                <path refid="android.target.classpath"/>
+            </classpath>
+        </junit>
+        <fail if="junit.failure" message="Unit test(s) failed. See reports!"/>
+    </target>
+
+<!-- extension targets. Uncomment the ones where you want to do custom work
+     in between standard targets -->
+<!--
+    <target name="-pre-build">
+    </target>
+    <target name="-pre-compile">
+    </target>
+
+    [This is typically used for code obfuscation.
+     Compiled code location: ${out.classes.absolute.dir}
+     If this is not done in place, override ${out.dex.input.absolute.dir}]
+    <target name="-post-compile">
+    </target>
+-->
+
+    <!-- Execute the Android Setup task that will setup some properties
+         specific to the target, and import the build rules files.
+
+         The rules file is imported from
+            <SDK>/tools/ant/
+         Depending on the project type it can be either:
+         - main_rules.xml
+         - lib_rules.xml
+         - test_rules.xml
+
+         To customize existing targets, there are two options:
+         - Customize only one target:
+             - copy/paste the target into this file, *before* the
+               <setup> task.
+             - customize it to your needs.
+         - Customize the whole script.
+             - copy/paste the content of the rules files (minus the top node)
+               into this file, *after* the <setup> task
+             - disable the import of the rules by changing the setup task
+               below to <setup import="false" />.
+             - customize to your needs.
+    -->
+    <setup />
+
+</project>
